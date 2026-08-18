@@ -1,0 +1,35 @@
+Coloque aqui os GIFs de demonstração de cada exercício.
+
+Esta pasta está vazia de propósito: nenhum GIF de exercício foi inventado
+ou gerado automaticamente. Enquanto o arquivo não existir, o app mostra
+um placeholder colorido no lugar, com o nome do arquivo esperado.
+
+Nomes de arquivo esperados pelo app (script.js), um por exercício:
+
+  elevacao-pelvica.gif
+  rdl.gif
+  cadeira-abdutora.gif
+  abducao-polia.gif
+  cadeira-flexora.gif
+  panturrilha.gif
+  agachamento-tarsa.gif
+  puxada-alta-aberta.gif
+  remada-baixa-fechada.gif
+  pulldown.gif
+  desenvolvimento-ombros.gif
+  elevacao-lateral.gif
+  triceps-corda.gif
+  triceps-testa.gif
+  triceps-martelo.gif
+  puxada-alta-neutra.gif
+  remada-articulada.gif
+  rosca-direta.gif
+  rosca-martelo.gif
+
+Basta salvar o GIF com o nome exato acima dentro desta pasta
+(assets/exercises/) que ele aparece automaticamente no card do exercício,
+sem precisar mexer em nenhum código.
+
+Dica: para o site carregar rápido no celular, prefira GIFs curtos
+(poucos segundos, em loop) e comprimidos, ou considere convertê-los
+para vídeo .mp4/.webm curto no futuro.
