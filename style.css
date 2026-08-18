@@ -726,13 +726,55 @@ button{ font-family: inherit; }
   flex-shrink: 0;
 }
 
+.exercise-loading-image.is-missing{ display: none; }
+
 .exercise-loading-text{
   font-size: .85rem;
   font-weight: 700;
   color: var(--ink-soft);
   margin: 0;
   letter-spacing: -.01em;
+  animation: manu-pulse 1.8s ease-in-out infinite;
 }
+
+@keyframes manu-pulse{
+  0%, 100%{ opacity: .55; }
+  50%{ opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .exercise-loading-image,
+  .exercise-loading-text{ animation: none; }
+}
+
+/* Estado de erro — irmão independente do estado de carregamento */
+.exercise-error{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  text-align: center;
+  overflow: hidden;
+  border-radius: calc(var(--radius-md) - 6px);
+  background: linear-gradient(135deg, var(--cream) 0%, var(--accent-soft) 100%);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: .82rem;
+  z-index: 11;
+  opacity: 1;
+  transition: opacity .35s ease-out;
+}
+
+.exercise-error.is-hidden{
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
 
 /* ==========================================================================
    COMPLETE BUTTON

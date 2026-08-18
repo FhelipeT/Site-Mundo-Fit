@@ -348,8 +348,12 @@
       '</div>' +
       '<div class="exercise-media">' +
         '<div class="exercise-loading">' +
-          '<img src="assets/images/manu.png" alt="Manu carregando exercício" class="exercise-loading-image" />' +
+          '<img src="assets/images/manu.png" alt="" aria-hidden="true" class="exercise-loading-image" />' +
           '<p class="exercise-loading-text">Carregando exercício...</p>' +
+        '</div>' +
+        '<div class="exercise-error is-hidden" role="status">' +
+          '<svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="12" r="1.4" fill="currentColor"/><circle cx="15.5" cy="12" r="1.4" fill="currentColor"/></svg>' +
+          '<span>Não foi possível carregar a demonstração.</span>' +
         '</div>' +
         '<video ' +
           'src="' + exercise.media + '" ' +
@@ -360,22 +364,44 @@
       '</div>';
 
     var video = card.querySelector("video");
-    var mediaContainer = card.querySelector(".exercise-media");
     var loadingOverlay = card.querySelector(".exercise-loading");
+    var errorOverlay = card.querySelector(".exercise-error");
+    var manuImg = card.querySelector(".exercise-loading-image");
+    var settled = false;
 
-    // Hide loading state when video is ready to play
-    video.addEventListener("canplay", function () {
-      loadingOverlay.classList.add("is-hidden");
-    });
-
-    // Handle video errors - only on genuine load failure
-    video.addEventListener("error", function () {
-      mediaContainer.innerHTML =
-        '<div class="exercise-placeholder">' +
-          '<svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="12" r="1.4" fill="currentColor"/><circle cx="15.5" cy="12" r="1.4" fill="currentColor"/></svg>' +
-          '<span>Não foi possível carregar a demonstração.</span>' +
-        '</div>';
+    // Se a imagem da Manu ainda não estiver no projeto, some com ela em vez
+    // de mostrar o ícone de imagem quebrada — o texto continua aparecendo.
+    manuImg.addEventListener("error", function () {
+      manuImg.classList.add("is-missing");
     }, { once: true });
+
+    function showVideo() {
+      if (settled) return;
+      settled = true;
+      loadingOverlay.classList.add("is-hidden");
+    }
+
+    function showError() {
+      if (settled) return;
+      settled = true;
+      // Estados independentes: apenas alterna a visibilidade, sem recriar
+      // o container de mídia nem destruir o componente de carregamento.
+      loadingOverlay.classList.add("is-hidden");
+      errorOverlay.classList.remove("is-hidden");
+    }
+
+    video.addEventListener("canplay", showVideo);
+    video.addEventListener("loadeddata", showVideo);
+    video.addEventListener("error", showError);
+
+    // Caso o vídeo já esteja pronto (cache/service worker) antes dos
+    // listeners serem registrados.
+    if (video.error) {
+      showError();
+    } else if (video.readyState >= 2) {
+      showVideo();
+    }
+
 
     return card;
   }
