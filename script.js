@@ -347,6 +347,10 @@
         setsBadge +
       '</div>' +
       '<div class="exercise-media">' +
+        '<div class="exercise-loading">' +
+          '<img src="assets/images/manu.png" alt="Manu carregando exercício" class="exercise-loading-image" />' +
+          '<p class="exercise-loading-text">Carregando exercício...</p>' +
+        '</div>' +
         '<video ' +
           'src="' + exercise.media + '" ' +
           'class="exercise-video" ' +
@@ -356,12 +360,20 @@
       '</div>';
 
     var video = card.querySelector("video");
+    var mediaContainer = card.querySelector(".exercise-media");
+    var loadingOverlay = card.querySelector(".exercise-loading");
+
+    // Hide loading state when video is ready to play
+    video.addEventListener("canplay", function () {
+      loadingOverlay.classList.add("is-hidden");
+    });
+
+    // Handle video errors - only on genuine load failure
     video.addEventListener("error", function () {
-      var media = card.querySelector(".exercise-media");
-      media.innerHTML =
+      mediaContainer.innerHTML =
         '<div class="exercise-placeholder">' +
           '<svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="12" r="1.4" fill="currentColor"/><circle cx="15.5" cy="12" r="1.4" fill="currentColor"/></svg>' +
-          '<span>Vídeo em breve — procure em<br><code>' + exercise.media + '</code></span>' +
+          '<span>Não foi possível carregar a demonstração.</span>' +
         '</div>';
     }, { once: true });
 
