@@ -655,6 +655,8 @@ button{ font-family: inherit; }
   display: grid;
   place-items: center;
   position: relative;
+  isolation: isolate;
+  min-width: 0;
 }
 
 .exercise-video{
@@ -664,6 +666,12 @@ button{ font-family: inherit; }
   display: block;
   border-radius: calc(var(--radius-md) - 6px);
   background: rgba(255,255,255,.18);
+  opacity: 1;
+  transition: opacity .28s ease-out;
+}
+
+.exercise-video.is-loading{
+  opacity: 0;
 }
 
 .exercise-placeholder{
@@ -688,20 +696,21 @@ button{ font-family: inherit; }
 
 .exercise-loading{
   position: absolute;
-  inset: 0;
+  inset: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 12px;
   background: linear-gradient(135deg, var(--cream) 0%, var(--accent-soft) 100%);
-  border-radius: calc(var(--radius-md) - 6px);
+  border-radius: calc(var(--radius-md) - 8px);
   opacity: 1;
   transition: opacity .35s ease-out;
-  z-index: 10;
-  padding: 20px;
+  z-index: 1;
+  padding: 16px;
   text-align: center;
   overflow: hidden;
+  min-width: 0;
 }
 
 .exercise-loading.is-hidden{
@@ -716,9 +725,9 @@ button{ font-family: inherit; }
 }
 
 .exercise-loading-image{
-  width: 100%;
-  max-width: 120px;
-  max-height: 120px;
+  width: clamp(76px, 34%, 120px);
+  max-width: 100%;
+  max-height: min(120px, 52%);
   height: auto;
   display: block;
   object-fit: contain;
@@ -750,7 +759,11 @@ button{ font-family: inherit; }
 /* Estado de erro — irmão independente do estado de carregamento */
 .exercise-error{
   position: absolute;
+<<<<<<< HEAD
   inset: 0;
+=======
+  inset: 8px;
+>>>>>>> c8a6129 (Adiciona suporte a notificações via OneSignal)
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -759,12 +772,20 @@ button{ font-family: inherit; }
   padding: 20px;
   text-align: center;
   overflow: hidden;
+<<<<<<< HEAD
   border-radius: calc(var(--radius-md) - 6px);
+=======
+  border-radius: calc(var(--radius-md) - 8px);
+>>>>>>> c8a6129 (Adiciona suporte a notificações via OneSignal)
   background: linear-gradient(135deg, var(--cream) 0%, var(--accent-soft) 100%);
   color: var(--accent);
   font-weight: 700;
   font-size: .82rem;
+<<<<<<< HEAD
   z-index: 11;
+=======
+  z-index: 2;
+>>>>>>> c8a6129 (Adiciona suporte a notificações via OneSignal)
   opacity: 1;
   transition: opacity .35s ease-out;
 }

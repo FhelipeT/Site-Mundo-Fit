@@ -10,14 +10,7 @@
   /* ------------------------------------------------------------------ */
 
   function ex(name, sets, slug) {
-    var mediaUrl = "assets/exercises/" + slug + ".gif.mp4";
-    return {
-      name: name,
-      sets: sets || "",
-      gif: mediaUrl,
-      media: mediaUrl,
-      alt: "Execução do exercício " + name
-    };
+    return { name: name, sets: sets || "", video: "assets/exercises/" + slug + ".mp4" };
   }
 
   var GLUTEO_BASE = [
@@ -84,7 +77,7 @@
       key: "sex", short: "SEX", full: "Sexta-feira", emoji: "🦵",
       title: "Glúteo + Quadríceps", accent: "peach", type: "workout",
       groups: [
-        { name: null, exercises: GLUTEO_BASE.concat([ex("Agachamento Taça", "", "agachamento-tarsa")]) }
+        { name: null, exercises: GLUTEO_BASE.concat([ex("Agachamento tarsa", "", "agachamento-tarsa")]) }
       ]
     },
     {
@@ -135,18 +128,6 @@
   var WEEK_DATES = getWeekDates();
   var TODAY_INDEX = todayIndexMonFirst();
 
-  // Recalcula a data "de hoje" e a semana correspondente a partir do
-  // relógio do dispositivo. Chamado no carregamento, ao voltar de segundo
-  // plano e exatamente à meia-noite local — nunca por polling constante.
-  function syncToday() {
-    var newIndex = todayIndexMonFirst();
-    var newDates = getWeekDates();
-    var changed = newIndex !== TODAY_INDEX || toISODate(newDates[0]) !== toISODate(WEEK_DATES[0]);
-    TODAY_INDEX = newIndex;
-    WEEK_DATES = newDates;
-    return changed;
-  }
-
   /* ------------------------------------------------------------------ */
   /* 3. PERSISTÊNCIA (localStorage)                                      */
   /* ------------------------------------------------------------------ */
@@ -190,7 +171,6 @@
   var overviewList = document.getElementById("overview-list");
 
   var btnHome = document.getElementById("btn-home");
-  var btnToday = document.getElementById("btn-today");
   var btnBack = document.getElementById("btn-back");
 
   var workoutDayEl = document.getElementById("workout-day");
@@ -347,6 +327,7 @@
         setsBadge +
       '</div>' +
       '<div class="exercise-media">' +
+<<<<<<< HEAD
         '<div class="exercise-loading">' +
           '<img src="assets/images/manu.png" alt="" aria-hidden="true" class="exercise-loading-image" />' +
           '<p class="exercise-loading-text">Carregando exercício...</p>' +
@@ -402,6 +383,65 @@
       showVideo();
     }
 
+=======
+        '<video class="exercise-video is-loading" muted loop playsinline preload="metadata" aria-label="Demonstração do exercício ' + exercise.name + '">' +
+          '<source src="' + exercise.video + '" type="video/mp4">' +
+        '</video>' +
+        '<div class="exercise-loading" aria-live="polite">' +
+          '<img class="exercise-loading-image" src="assets/images/manu.png" alt="" aria-hidden="true">' +
+          '<p class="exercise-loading-text">Carregando exercício...</p>' +
+        '</div>' +
+      '</div>';
+
+    var media = card.querySelector(".exercise-media");
+    var video = media.querySelector(".exercise-video");
+    var loading = media.querySelector(".exercise-loading");
+    var loadingImage = media.querySelector(".exercise-loading-image");
+    var videoFailed = false;
+
+    // O loading já existe no primeiro render do card; apenas o vídeo decide
+    // quando ele pode desaparecer. Não há temporizador artificial aqui.
+    function showVideo() {
+      if (videoFailed || !loading || !video) return;
+      loading.classList.add("is-hidden");
+      video.classList.remove("is-loading");
+      loading.addEventListener("transitionend", function () {
+        if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+      }, { once: true });
+    }
+
+    function showVideoError() {
+      if (!media || media.querySelector(".exercise-error")) return;
+      videoFailed = true;
+      video.classList.add("is-loading");
+
+      var error = document.createElement("div");
+      error.className = "exercise-error";
+      error.setAttribute("role", "status");
+      error.textContent = "Não foi possível carregar a demonstração.";
+      media.appendChild(error);
+
+      if (loading && loading.parentNode) {
+        loading.classList.add("is-hidden");
+        loading.addEventListener("transitionend", function () {
+          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+        }, { once: true });
+      }
+    }
+
+    // Caso a ilustração não esteja disponível, o texto de loading continua
+    // presente e o card não expõe informações técnicas ao usuário.
+    loadingImage.addEventListener("error", function () {
+      loadingImage.classList.add("is-missing");
+    }, { once: true });
+
+    video.addEventListener("canplay", showVideo, { once: true });
+    video.addEventListener("error", showVideoError, { once: true });
+
+    // `canplay` pode já ter ocorrido antes da ligação dos listeners quando o
+    // vídeo vier do cache; nesse caso, preservamos a mesma transição.
+    if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) showVideo();
+>>>>>>> c8a6129 (Adiciona suporte a notificações via OneSignal)
 
     return card;
   }
@@ -507,7 +547,6 @@
 
   function goHome() {
     currentDayKey = null;
-    syncToday();
     renderWeekStrip();
     renderSpotlight();
     renderOverview();
@@ -537,11 +576,6 @@
   btnHome.addEventListener("click", goHome);
   btnBack.addEventListener("click", goHome);
 
-  btnToday.addEventListener("click", function () {
-    syncToday();
-    openWorkout(WEEK[TODAY_INDEX].key);
-  });
-
   completeBtn.addEventListener("click", function () {
     if (!currentDayKey) return;
     var dayIndex = WEEK.findIndex(function (d) { return d.key === currentDayKey; });
@@ -557,48 +591,14 @@
     }
   });
 
-  // Se o dia mudou enquanto a página estava aberta (ex.: aberta às 23h59
-  // e esquecida até depois da meia-noite, ou o celular voltou de segundo
-  // plano no dia seguinte), atualiza o destaque do dia atual. Só re-renderiza
-  // a tela inicial — se a pessoa estiver vendo o treino de um dia específico,
-  // isso não é interrompido.
-  function handlePossibleDateChange() {
-    var changed = syncToday();
-    if (changed && !viewHome.classList.contains("is-hidden")) {
-      renderWeekStrip();
-      renderSpotlight();
-      renderOverview();
-    }
-  }
-
-  document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "visible") {
-      handlePossibleDateChange();
-    }
-  });
-
-  // Agenda uma única verificação exatamente na próxima meia-noite local
-  // (em vez de um intervalo repetido) e se reagenda a cada execução.
-  function scheduleMidnightSync() {
-    var now = new Date();
-    var nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 3);
-    var ms = nextMidnight.getTime() - now.getTime();
-    setTimeout(function () {
-      handlePossibleDateChange();
-      scheduleMidnightSync();
-    }, ms);
-  }
-
   /* ------------------------------------------------------------------ */
   /* 12. INICIALIZAÇÃO                                                   */
   /* ------------------------------------------------------------------ */
 
   function init() {
-    syncToday();
     renderWeekStrip();
     renderSpotlight();
     renderOverview();
-    scheduleMidnightSync();
 
     var hash = window.location.hash.replace("#", "");
     var validDay = WEEK.some(function (d) { return d.key === hash; });
@@ -621,4 +621,3 @@
     });
   }
 })();
-
