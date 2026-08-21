@@ -4,7 +4,11 @@
    Aumente CACHE_VERSION sempre que publicar mudanças relevantes.
    ========================================================================== */
 
+<<<<<<< HEAD
 var CACHE_VERSION = "mundofit-v2";
+=======
+var CACHE_VERSION = "mundofit-v1";
+>>>>>>> a2643d858fb58dbd86192f76e128d6f386eb66af
 
 var APP_SHELL = [
   "./",
@@ -72,9 +76,12 @@ self.addEventListener("fetch", function (event) {
   }
 var pathname = new URL(request.url).pathname;
 
+<<<<<<< HEAD
 if (pathname.toLowerCase().endsWith(".mp4")) {
   return;
 }
+=======
+>>>>>>> a2643d858fb58dbd86192f76e128d6f386eb66af
   event.respondWith(
     caches.match(request).then(function (cached) {
       if (cached) return cached;

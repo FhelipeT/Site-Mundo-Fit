@@ -820,7 +820,15 @@ button{ font-family: inherit; }
 /* Estado de erro — irmão independente do estado de carregamento */
 .exercise-error{
   position: absolute;
+<<<<<<< HEAD
   inset: 8px;
+=======
+<<<<<<< HEAD
+  inset: 0;
+=======
+  inset: 8px;
+>>>>>>> c8a6129 (Adiciona suporte a notificações via OneSignal)
+>>>>>>> a2643d858fb58dbd86192f76e128d6f386eb66af
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -829,12 +837,28 @@ button{ font-family: inherit; }
   padding: 20px;
   text-align: center;
   overflow: hidden;
+<<<<<<< HEAD
   border-radius: calc(var(--radius-md) - 8px);
+=======
+<<<<<<< HEAD
+  border-radius: calc(var(--radius-md) - 6px);
+=======
+  border-radius: calc(var(--radius-md) - 8px);
+>>>>>>> c8a6129 (Adiciona suporte a notificações via OneSignal)
+>>>>>>> a2643d858fb58dbd86192f76e128d6f386eb66af
   background: linear-gradient(135deg, var(--cream) 0%, var(--accent-soft) 100%);
   color: var(--accent);
   font-weight: 700;
   font-size: .82rem;
+<<<<<<< HEAD
   z-index: 2;
+=======
+<<<<<<< HEAD
+  z-index: 11;
+=======
+  z-index: 2;
+>>>>>>> c8a6129 (Adiciona suporte a notificações via OneSignal)
+>>>>>>> a2643d858fb58dbd86192f76e128d6f386eb66af
   opacity: 1;
   transition: opacity .35s ease-out;
 }

@@ -10,7 +10,14 @@
   /* ------------------------------------------------------------------ */
 
   function ex(name, sets, slug) {
-    return { name: name, sets: sets || "", slug: slug, video: "assets/exercises/" + slug + ".mp4" };
+    var mediaUrl = "assets/exercises/" + slug + ".gif.mp4";
+    return {
+      name: name,
+      sets: sets || "",
+      gif: mediaUrl,
+      media: mediaUrl,
+      alt: "Execução do exercício " + name
+    };
   }
 
   var GLUTEO_BASE = [
@@ -194,7 +201,6 @@
   var overviewList = document.getElementById("overview-list");
 
   var btnHome = document.getElementById("btn-home");
-  var btnToday = document.getElementById("btn-today");
   var btnBack = document.getElementById("btn-back");
 
   var workoutDayEl = document.getElementById("workout-day");
@@ -371,9 +377,8 @@
         setsBadge +
       '</div>' +
       '<div class="exercise-media">' +
-        '<video class="exercise-video is-loading" muted loop playsinline autoplay preload="auto" aria-label="Demonstração do exercício ' + exercise.name + '"></video>' +
-        '<div class="exercise-loading" aria-live="polite">' +
-          '<img class="exercise-loading-image" src="assets/images/manu.png" alt="" aria-hidden="true">' +
+        '<div class="exercise-loading">' +
+          '<img src="assets/images/manu.png" alt="" aria-hidden="true" class="exercise-loading-image" />' +
           '<p class="exercise-loading-text">Carregando exercício...</p>' +
         '</div>' +
       '</div>' +
@@ -465,14 +470,16 @@
     }
 
     video.addEventListener("loadeddata", showVideo);
-    video.addEventListener("canplay", showVideo);
-    video.addEventListener("error", function () { loadCandidate(); });
+    video.addEventListener("error", showError);
 
-    loadCandidate();
+    // Caso o vídeo já esteja pronto (cache/service worker) antes dos
+    // listeners serem registrados.
+    if (video.error) {
+      showError();
+    } else if (video.readyState >= 2) {
+      showVideo();
+    }
 
-    // `canplay` pode já ter ocorrido antes da ligação dos listeners quando o
-    // vídeo vier do cache; nesse caso, preservamos a mesma transição.
-    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) showVideo();
 
     return card;
   }
@@ -660,18 +667,10 @@
   btnHome.addEventListener("click", goHome);
   btnToday.addEventListener("click", function () { openWorkout(WEEK[TODAY_INDEX].key); });
   btnBack.addEventListener("click", goHome);
-  navLinks.forEach(function (link) {
-    link.addEventListener("click", function () { goHome(); if (link.getAttribute("data-view") !== "home") openInformationView(link.getAttribute("data-view")); });
-  });
 
-  profileWeightForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-    var nextWeight = parseFloat(String(profileWeightInput.value).replace(",", "."));
-    if (!isFinite(nextWeight) || nextWeight <= 0 || nextWeight > 500) { showToast("Digite um peso válido em kg."); return; }
-    try { window.localStorage.setItem(PROFILE_WEIGHT_KEY, String(nextWeight)); }
-    catch (e) { showToast("Não foi possível salvar o peso neste aparelho."); return; }
-    renderProfile();
-    showToast("Peso atualizado! O IMC foi recalculado.");
+  btnToday.addEventListener("click", function () {
+    syncToday();
+    openWorkout(WEEK[TODAY_INDEX].key);
   });
 
   completeBtn.addEventListener("click", function () {
