@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mundo Fit da Manu — Seu treino, seu ritmo</title>
+<meta name="description" content="Mundo Fit da Manu: acompanhe seus treinos da semana, veja exercícios, séries e demonstrações em GIF, tudo em um app colorido e feito para o celular.">
+<meta name="theme-color" content="#3D2259">
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+<link rel="preload" href="assets/images/manu.png" as="image">
+</head>
+<body>
+
+<a class="skip-link" href="#conteudo-principal">Pular para o conteúdo principal</a>
+
+<div class="app-shell">
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="app-header">
+    <button type="button" class="brand" id="btn-home" aria-label="Ir para a tela inicial">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="34" height="34" role="img" aria-hidden="true">
+          <circle cx="24" cy="24" r="22" fill="var(--pink)"/>
+          <path d="M14 24c0-4 3-7 7-7h6c4 0 7 3 7 7s-3 7-7 7h-6c-4 0-7-3-7-7z" fill="var(--cream)"/>
+          <circle cx="14" cy="24" r="4.5" fill="var(--purple-deep)"/>
+          <circle cx="34" cy="24" r="4.5" fill="var(--purple-deep)"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-title">Mundo Fit da Manu</span>
+        <span class="brand-subtitle">Seu treino, seu ritmo 💜</span>
+      </span>
+    </button>
+
+    <button type="button" class="btn-today" id="btn-today" aria-label="Ir para o treino de hoje">
+      <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Hoje
+    </button>
+  </header>
+
+  <nav class="main-nav" aria-label="Navegação principal">
+    <button type="button" class="main-nav-link is-active" data-view="home" aria-current="page">Início</button>
+    <button type="button" class="main-nav-link" data-view="diet">Dieta</button>
+    <button type="button" class="main-nav-link" data-view="profile">Perfil</button>
+  </nav>
+
+  <main id="conteudo-principal">
+
+    <!-- ===================== TELA INÍCIO ===================== -->
+    <section id="view-home" class="view" aria-labelledby="home-heading">
+
+      <h1 id="home-heading" class="visually-hidden">Mundo Fit da Manu — o que vamos treinar hoje?</h1>
+
+      <div class="home-intro">
+        <p class="eyebrow">Sua semana</p>
+        <h2 class="home-question">O que a gente treina hoje?</h2>
+      </div>
+
+      <nav class="week-strip" aria-label="Dias da semana">
+        <ol id="week-list" class="week-list"></ol>
+      </nav>
+
+      <section class="today-spotlight" id="today-spotlight" aria-live="polite">
+        <!-- preenchido via JS -->
+      </section>
+
+      <section class="week-overview" aria-label="Resumo da semana">
+        <p class="section-label">Semana completa</p>
+        <ul id="overview-list" class="overview-list"></ul>
+      </section>
+
+    </section>
+
+    <!-- ===================== TELA TREINO / DESCANSO ===================== -->
+    <section id="view-workout" class="view is-hidden" aria-labelledby="workout-heading" tabindex="-1">
+
+      <button type="button" class="back-button" id="btn-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Voltar
+      </button>
+
+      <div id="workout-header" class="workout-header">
+        <p id="workout-day" class="workout-day"></p>
+        <h2 id="workout-heading" class="workout-title"></h2>
+        <div id="workout-chips" class="workout-chips" role="list"></div>
+      </div>
+
+      <!-- Estado: dia de descanso -->
+      <div id="rest-state" class="rest-state is-hidden">
+        <div class="rest-illustration" aria-hidden="true">
+          <svg viewBox="0 0 120 120" width="120" height="120">
+            <circle cx="60" cy="60" r="58" fill="var(--lilac-soft)"/>
+            <path d="M32 66c0-14 12-26 28-26s28 12 28 26" fill="none" stroke="var(--purple-deep)" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="46" cy="54" r="4" fill="var(--purple-deep)"/>
+            <circle cx="74" cy="54" r="4" fill="var(--purple-deep)"/>
+            <text x="86" y="34" font-size="20">💤</text>
+          </svg>
+        </div>
+        <p class="rest-title">Hoje é dia de descansar 😴</p>
+        <p class="rest-message">Seu corpo recupera e cresce nos dias de descanso. Aproveite pra hidratar bem, dormir bem e voltar ainda mais forte no próximo treino.</p>
+      </div>
+
+      <!-- Estado: lista de exercícios -->
+      <div id="exercise-groups" class="exercise-groups"></div>
+
+      <div id="complete-wrap" class="complete-wrap is-hidden">
+        <p class="rest-note">Respeite o seu tempo de descanso entre as séries 💜</p>
+        <button type="button" id="btn-complete" class="complete-button">
+          <span class="complete-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span id="complete-label">Marcar treino como concluído</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ===================== TELA DIETA ===================== -->
+    <section id="view-diet" class="view is-hidden" aria-labelledby="diet-heading" tabindex="-1">
+      <div class="section-intro">
+        <p class="eyebrow">Planejamento alimentar</p>
+        <h2 id="diet-heading" class="page-title">Dieta da Manu 🍽️</h2>
+        <p class="page-description">Opções práticas para organizar as refeições do dia.</p>
+      </div>
+
+      <div class="meal-list">
+        <article class="meal-card" data-accent="pink">
+          <div class="meal-card-heading"><span class="meal-icon" aria-hidden="true">☕</span><div><p class="meal-kicker">Café da manhã &amp; lanche</p><h3>Comece com energia</h3></div></div>
+          <div class="meal-option"><div class="meal-option-head"><strong>Opção 1 — Café da manhã</strong><span>~340 kcal</span></div><p>2 ovos mexidos · 1 fatia de pão integral artesanal · 1 fruta · 1 copo de iogurte zero</p></div>
+          <div class="meal-option"><div class="meal-option-head"><strong>Opção 2 — Lanche</strong><span>~280 kcal</span></div><p>Sanduíche natural de frango desfiado com requeijão ou cream cheese light, milho, tomate e alface.</p></div>
+          <div class="meal-option"><strong>Opção 3 — Cuscuz</strong><p>Ideal para variar a fonte de carboidrato no café ou lanche. Acompanhamento: fruta.</p></div>
+        </article>
+
+        <article class="meal-card" data-accent="mint">
+          <div class="meal-card-heading"><span class="meal-icon" aria-hidden="true">🍽️</span><div><p class="meal-kicker">Almoço</p><h3>Variações do dia a dia</h3></div><span class="meal-kcal">~410 kcal</span></div>
+          <div class="meal-option"><strong>Opção 1 — Padrão do dia a dia</strong><p>Arroz de brócolis ou arroz branco · feijão · frango desfiado + ovo cozido, tilápia ou alcatra/patinho · salada de alface e tomate.</p></div>
+          <div class="meal-option"><strong>Opção 2 — Novidade</strong><p>Macarrão com creme de milho (feito com sachê de milho), frango desfiado e sem feijão.</p></div>
+        </article>
+
+        <article class="meal-card" data-accent="lilac">
+          <div class="meal-card-heading"><span class="meal-icon" aria-hidden="true">🌙</span><div><p class="meal-kicker">Janta</p><h3>Variações rápidas</h3></div><span class="meal-kcal">~380 kcal</span></div>
+          <div class="meal-option"><strong>Opção 1</strong><p>Alcatra ou patinho na frigideira · batatinhas na Airfryer · salada de alface e tomate.</p></div>
+          <div class="meal-option"><strong>Opção 2</strong><p>Tirinhas de peito de frango salteadas · batatinhas na Airfryer · salada de alface e tomate.</p></div>
+          <div class="meal-option"><strong>Opção 3</strong><p>Repetir uma opção do almoço, como arroz de brócolis ou tradicional com carne ou frango.</p></div>
+        </article>
+
+        <aside class="diet-note" data-accent="peach"><span aria-hidden="true">💧</span><div><strong>Hidratação</strong><p>Mantenha a hidratação ao longo do dia, especialmente nos dias de treino.</p></div></aside>
+        <aside class="diet-note" data-accent="lilac"><span aria-hidden="true">✨</span><div><strong>Creatina</strong><p>Tome sua creatina diária, não se esqueça!</p></div></aside>
+      </div>
+    </section>
+
+    <!-- ===================== TELA PERFIL ===================== -->
+    <section id="view-profile" class="view is-hidden" aria-labelledby="profile-heading" tabindex="-1">
+      <div class="section-intro">
+        <p class="eyebrow">Informações pessoais</p>
+        <h2 id="profile-heading" class="page-title">Perfil da Manu 💜</h2>
+      </div>
+      <article class="profile-hero">
+        <p class="profile-name">Emanuelle Dos Anjos</p>
+        <p class="profile-meta"><span id="profile-age"></span> anos · 1,57 m</p>
+      </article>
+      <div class="profile-grid">
+        <article class="metric-card" data-accent="pink">
+          <p class="metric-label">Peso atual</p>
+          <p id="profile-weight-value" class="metric-value">77,3 kg</p>
+          <form id="profile-weight-form" class="metric-form">
+            <label class="visually-hidden" for="profile-weight-input">Atualizar peso em quilogramas</label>
+            <input id="profile-weight-input" type="number" inputmode="decimal" min="1" max="500" step="0.1" required>
+            <button type="submit">Salvar</button>
+          </form>
+        </article>
+        <article class="metric-card" data-accent="mint">
+          <p class="metric-label">IMC</p>
+          <p id="profile-bmi-value" class="metric-value"></p>
+          <p id="profile-bmi-classification" class="metric-detail"></p>
+        </article>
+        <article class="metric-card metric-card-wide" data-accent="lilac">
+          <p class="metric-label">TMB aproximada</p>
+          <p class="metric-value">~1.555 kcal/dia</p>
+          <p class="metric-detail">Quantidade aproximada de calorias que o corpo utiliza por dia em repouso, sem considerar treinos ou atividades da rotina.</p>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>Feito com carinho para o Mundo Fit da Manu 💪💜</p>
+  </footer>
+
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
