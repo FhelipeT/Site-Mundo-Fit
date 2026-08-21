@@ -194,6 +194,61 @@ button{ font-family: inherit; }
 }
 
 /* ==========================================================================
+   MAIN NAVIGATION / INFORMATION PAGES
+   ========================================================================== */
+.main-nav{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 6px;
+  margin: 2px 0 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,.68);
+  box-shadow: 0 5px 18px -14px rgba(59,34,88,.35);
+}
+.main-nav-link{
+  border: 0;
+  border-radius: 13px;
+  padding: 10px 6px;
+  background: transparent;
+  color: var(--ink-soft);
+  font: 800 .84rem var(--font-body);
+  cursor: pointer;
+}
+.main-nav-link.is-active{ background: var(--purple-deep); color: #fff; box-shadow: 0 6px 14px -9px rgba(59,34,88,.6); }
+.section-intro{ margin: 10px 0 18px; }
+.page-title{ margin: 0 0 5px; font: 700 1.65rem/1.12 var(--font-display); }
+.page-description{ margin: 0; color: var(--ink-soft); font-weight: 700; font-size: .92rem; }
+.meal-list{ display: flex; flex-direction: column; gap: 15px; margin-bottom: 26px; }
+.meal-card, .profile-hero, .metric-card, .diet-note{ background: var(--card); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.meal-card{ padding: 18px; border-top: 7px solid var(--accent); }
+.meal-card-heading{ display: flex; align-items: center; gap: 11px; margin-bottom: 14px; }
+.meal-icon{ display: grid; place-items: center; width: 43px; height: 43px; flex: 0 0 auto; border-radius: 14px; background: var(--accent-soft); font-size: 1.32rem; }
+.meal-kicker, .metric-label{ margin: 0 0 1px; color: var(--accent); font-size: .73rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.meal-card h3{ margin: 0; font: 700 1.13rem/1.15 var(--font-display); }
+.meal-kcal{ margin-left: auto; color: var(--accent); background: var(--accent-soft); border-radius: var(--radius-pill); padding: 5px 9px; font-size: .75rem; font-weight: 800; white-space: nowrap; }
+.meal-option{ padding: 11px 0; border-top: 1px solid rgba(59,34,88,.09); }
+.meal-option strong{ color: var(--purple-deep); font-size: .91rem; }
+.meal-option p{ margin: 5px 0 0; color: var(--ink-soft); font-size: .88rem; font-weight: 700; line-height: 1.45; }
+.meal-option-head{ display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.meal-option-head span{ color: var(--accent); font-size: .75rem; font-weight: 800; white-space: nowrap; }
+.diet-note{ display: flex; gap: 12px; padding: 15px 17px; border-left: 6px solid var(--accent); }
+.diet-note > span{ font-size: 1.3rem; }
+.diet-note strong{ font-size: .93rem; }
+.diet-note p{ margin: 2px 0 0; color: var(--ink-soft); font-size: .84rem; font-weight: 700; line-height: 1.4; }
+.profile-hero{ padding: 20px; margin-bottom: 15px; background: linear-gradient(135deg, var(--purple-deep), var(--purple-mid)); color: #fff; }
+.profile-name{ margin: 0 0 4px; font: 700 1.42rem var(--font-display); }
+.profile-meta{ margin: 0; font-size: .9rem; font-weight: 700; opacity: .86; }
+.profile-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 26px; }
+.metric-card{ padding: 17px; border-top: 6px solid var(--accent); min-width: 0; }
+.metric-card-wide{ grid-column: 1 / -1; }
+.metric-value{ margin: 5px 0; font: 700 1.36rem/1.12 var(--font-display); color: var(--purple-deep); }
+.metric-detail{ margin: 4px 0 0; color: var(--ink-soft); font-size: .79rem; font-weight: 700; line-height: 1.35; }
+.metric-form{ display: flex; gap: 6px; margin-top: 10px; }
+.metric-form input, .exercise-weight-form input{ min-width: 0; width: 100%; border: 1px solid rgba(59,34,88,.18); border-radius: 10px; background: var(--cream); color: var(--purple-deep); padding: 8px 9px; font: 800 .88rem var(--font-body); }
+.metric-form button, .exercise-weight-form button{ flex: 0 0 auto; border: 0; border-radius: 10px; background: var(--accent); color: #fff; padding: 8px 10px; font: 800 .78rem var(--font-body); cursor: pointer; }
+
+/* ==========================================================================
    HOME — INTRO
    ========================================================================== */
 .home-intro{ margin: 10px 0 18px; }
@@ -655,6 +710,8 @@ button{ font-family: inherit; }
   display: grid;
   place-items: center;
   position: relative;
+  isolation: isolate;
+  min-width: 0;
 }
 
 .exercise-video{
@@ -664,6 +721,12 @@ button{ font-family: inherit; }
   display: block;
   border-radius: calc(var(--radius-md) - 6px);
   background: rgba(255,255,255,.18);
+  opacity: 1;
+  transition: opacity .28s ease-out;
+}
+
+.exercise-video.is-loading{
+  opacity: 0;
 }
 
 .exercise-placeholder{
@@ -678,6 +741,12 @@ button{ font-family: inherit; }
   padding: 12px;
 }
 
+/* Compact load record inside exercise cards */
+.exercise-weight{ margin-top: 13px; padding: 11px; border-radius: var(--radius-sm); background: var(--accent-soft); }
+.exercise-weight-summary{ display: flex; flex-wrap: wrap; gap: 4px 13px; margin-bottom: 9px; color: var(--purple-mid); font-size: .78rem; font-weight: 800; }
+.exercise-weight-summary strong{ color: var(--purple-deep); }
+.exercise-weight-form{ display: flex; gap: 7px; }
+
 /* ==========================================================================
    EXERCISE LOADING STATE (Manu animation)
    ========================================================================== */
@@ -688,20 +757,21 @@ button{ font-family: inherit; }
 
 .exercise-loading{
   position: absolute;
-  inset: 0;
+  inset: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 12px;
   background: linear-gradient(135deg, var(--cream) 0%, var(--accent-soft) 100%);
-  border-radius: calc(var(--radius-md) - 6px);
+  border-radius: calc(var(--radius-md) - 8px);
   opacity: 1;
   transition: opacity .35s ease-out;
-  z-index: 10;
-  padding: 20px;
+  z-index: 1;
+  padding: 16px;
   text-align: center;
   overflow: hidden;
+  min-width: 0;
 }
 
 .exercise-loading.is-hidden{
@@ -716,9 +786,9 @@ button{ font-family: inherit; }
 }
 
 .exercise-loading-image{
-  width: 100%;
-  max-width: 120px;
-  max-height: 120px;
+  width: clamp(76px, 34%, 120px);
+  max-width: 100%;
+  max-height: min(120px, 52%);
   height: auto;
   display: block;
   object-fit: contain;
@@ -750,7 +820,7 @@ button{ font-family: inherit; }
 /* Estado de erro — irmão independente do estado de carregamento */
 .exercise-error{
   position: absolute;
-  inset: 0;
+  inset: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -759,12 +829,12 @@ button{ font-family: inherit; }
   padding: 20px;
   text-align: center;
   overflow: hidden;
-  border-radius: calc(var(--radius-md) - 6px);
+  border-radius: calc(var(--radius-md) - 8px);
   background: linear-gradient(135deg, var(--cream) 0%, var(--accent-soft) 100%);
   color: var(--accent);
   font-weight: 700;
   font-size: .82rem;
-  z-index: 11;
+  z-index: 2;
   opacity: 1;
   transition: opacity .35s ease-out;
 }

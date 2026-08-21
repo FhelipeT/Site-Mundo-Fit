@@ -16,6 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="style.css">
+<link rel="preload" href="assets/images/manu.png" as="image">
 </head>
 <body>
 
@@ -45,6 +46,12 @@
       Hoje
     </button>
   </header>
+
+  <nav class="main-nav" aria-label="Navegação principal">
+    <button type="button" class="main-nav-link is-active" data-view="home" aria-current="page">Início</button>
+    <button type="button" class="main-nav-link" data-view="diet">Dieta</button>
+    <button type="button" class="main-nav-link" data-view="profile">Perfil</button>
+  </nav>
 
   <main id="conteudo-principal">
 
@@ -115,6 +122,73 @@
         </button>
       </div>
 
+    </section>
+
+    <!-- ===================== TELA DIETA ===================== -->
+    <section id="view-diet" class="view is-hidden" aria-labelledby="diet-heading" tabindex="-1">
+      <div class="section-intro">
+        <p class="eyebrow">Planejamento alimentar</p>
+        <h2 id="diet-heading" class="page-title">Dieta da Manu 🍽️</h2>
+        <p class="page-description">Opções práticas para organizar as refeições do dia.</p>
+      </div>
+
+      <div class="meal-list">
+        <article class="meal-card" data-accent="pink">
+          <div class="meal-card-heading"><span class="meal-icon" aria-hidden="true">☕</span><div><p class="meal-kicker">Café da manhã &amp; lanche</p><h3>Comece com energia</h3></div></div>
+          <div class="meal-option"><div class="meal-option-head"><strong>Opção 1 — Café da manhã</strong><span>~340 kcal</span></div><p>2 ovos mexidos · 1 fatia de pão integral artesanal · 1 fruta · 1 copo de iogurte zero</p></div>
+          <div class="meal-option"><div class="meal-option-head"><strong>Opção 2 — Lanche</strong><span>~280 kcal</span></div><p>Sanduíche natural de frango desfiado com requeijão ou cream cheese light, milho, tomate e alface.</p></div>
+          <div class="meal-option"><strong>Opção 3 — Cuscuz</strong><p>Ideal para variar a fonte de carboidrato no café ou lanche. Acompanhamento: fruta.</p></div>
+        </article>
+
+        <article class="meal-card" data-accent="mint">
+          <div class="meal-card-heading"><span class="meal-icon" aria-hidden="true">🍽️</span><div><p class="meal-kicker">Almoço</p><h3>Variações do dia a dia</h3></div><span class="meal-kcal">~410 kcal</span></div>
+          <div class="meal-option"><strong>Opção 1 — Padrão do dia a dia</strong><p>Arroz de brócolis ou arroz branco · feijão · frango desfiado + ovo cozido, tilápia ou alcatra/patinho · salada de alface e tomate.</p></div>
+          <div class="meal-option"><strong>Opção 2 — Novidade</strong><p>Macarrão com creme de milho (feito com sachê de milho), frango desfiado e sem feijão.</p></div>
+        </article>
+
+        <article class="meal-card" data-accent="lilac">
+          <div class="meal-card-heading"><span class="meal-icon" aria-hidden="true">🌙</span><div><p class="meal-kicker">Janta</p><h3>Variações rápidas</h3></div><span class="meal-kcal">~380 kcal</span></div>
+          <div class="meal-option"><strong>Opção 1</strong><p>Alcatra ou patinho na frigideira · batatinhas na Airfryer · salada de alface e tomate.</p></div>
+          <div class="meal-option"><strong>Opção 2</strong><p>Tirinhas de peito de frango salteadas · batatinhas na Airfryer · salada de alface e tomate.</p></div>
+          <div class="meal-option"><strong>Opção 3</strong><p>Repetir uma opção do almoço, como arroz de brócolis ou tradicional com carne ou frango.</p></div>
+        </article>
+
+        <aside class="diet-note" data-accent="peach"><span aria-hidden="true">💧</span><div><strong>Hidratação</strong><p>Mantenha a hidratação ao longo do dia, especialmente nos dias de treino.</p></div></aside>
+        <aside class="diet-note" data-accent="lilac"><span aria-hidden="true">✨</span><div><strong>Creatina</strong><p>Tome sua creatina diária, não se esqueça!</p></div></aside>
+      </div>
+    </section>
+
+    <!-- ===================== TELA PERFIL ===================== -->
+    <section id="view-profile" class="view is-hidden" aria-labelledby="profile-heading" tabindex="-1">
+      <div class="section-intro">
+        <p class="eyebrow">Informações pessoais</p>
+        <h2 id="profile-heading" class="page-title">Perfil da Manu 💜</h2>
+      </div>
+      <article class="profile-hero">
+        <p class="profile-name">Emanuelle Dos Anjos</p>
+        <p class="profile-meta"><span id="profile-age"></span> anos · 1,57 m</p>
+      </article>
+      <div class="profile-grid">
+        <article class="metric-card" data-accent="pink">
+          <p class="metric-label">Peso atual</p>
+          <p id="profile-weight-value" class="metric-value">77,3 kg</p>
+          <form id="profile-weight-form" class="metric-form">
+            <label class="visually-hidden" for="profile-weight-input">Atualizar peso em quilogramas</label>
+            <input id="profile-weight-input" type="number" inputmode="decimal" min="1" max="500" step="0.1" required>
+            <button type="submit">Salvar</button>
+          </form>
+        </article>
+        <article class="metric-card" data-accent="mint">
+          <p class="metric-label">IMC</p>
+          <p id="profile-bmi-value" class="metric-value"></p>
+          <p id="profile-bmi-classification" class="metric-detail"></p>
+        </article>
+        <article class="metric-card metric-card-wide" data-accent="lilac">
+          <p class="metric-label">TMB aproximada</p>
+          <p class="metric-value">~1.555 kcal/dia</p>
+          <p class="metric-detail">Quantidade aproximada de calorias que o corpo utiliza por dia em repouso, sem considerar treinos ou atividades da rotina.</p>
+        </article>
+      </div>
     </section>
 
   </main>

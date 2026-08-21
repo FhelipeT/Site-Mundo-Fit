@@ -10,14 +10,7 @@
   /* ------------------------------------------------------------------ */
 
   function ex(name, sets, slug) {
-    var mediaUrl = "assets/exercises/" + slug + ".gif.mp4";
-    return {
-      name: name,
-      sets: sets || "",
-      gif: mediaUrl,
-      media: mediaUrl,
-      alt: "Execução do exercício " + name
-    };
+    return { name: name, sets: sets || "", slug: slug, video: "assets/exercises/" + slug + ".mp4" };
   }
 
   var GLUTEO_BASE = [
@@ -84,7 +77,7 @@
       key: "sex", short: "SEX", full: "Sexta-feira", emoji: "🦵",
       title: "Glúteo + Quadríceps", accent: "peach", type: "workout",
       groups: [
-        { name: null, exercises: GLUTEO_BASE.concat([ex("Agachamento Taça", "", "agachamento-tarsa")]) }
+        { name: null, exercises: GLUTEO_BASE.concat([ex("Agachamento tarsa", "", "agachamento-tarsa")]) }
       ]
     },
     {
@@ -102,6 +95,9 @@
   /* ------------------------------------------------------------------ */
 
   var STORAGE_KEY = "mundofit_treinos_concluidos";
+  var EXERCISE_WEIGHTS_KEY = "mundofit_exercise_weights";
+  var PROFILE_WEIGHT_KEY = "mundofit_profile_weight";
+  var DEFAULT_PROFILE_WEIGHT = 77.3;
 
   function todayIndexMonFirst() {
     // JS: 0 = domingo ... 6 = sábado  →  convertendo para 0 = segunda ... 6 = domingo
@@ -135,18 +131,6 @@
   var WEEK_DATES = getWeekDates();
   var TODAY_INDEX = todayIndexMonFirst();
 
-  // Recalcula a data "de hoje" e a semana correspondente a partir do
-  // relógio do dispositivo. Chamado no carregamento, ao voltar de segundo
-  // plano e exatamente à meia-noite local — nunca por polling constante.
-  function syncToday() {
-    var newIndex = todayIndexMonFirst();
-    var newDates = getWeekDates();
-    var changed = newIndex !== TODAY_INDEX || toISODate(newDates[0]) !== toISODate(WEEK_DATES[0]);
-    TODAY_INDEX = newIndex;
-    WEEK_DATES = newDates;
-    return changed;
-  }
-
   /* ------------------------------------------------------------------ */
   /* 3. PERSISTÊNCIA (localStorage)                                      */
   /* ------------------------------------------------------------------ */
@@ -179,12 +163,32 @@
     return next;
   }
 
+  function readLocalJSON(key) {
+    try { return JSON.parse(window.localStorage.getItem(key) || "{}"); }
+    catch (e) { return {}; }
+  }
+
+  function readExerciseWeights() { return readLocalJSON(EXERCISE_WEIGHTS_KEY); }
+
+  function formatWeight(value) {
+    return String(value).replace(".", ",") + " kg";
+  }
+
+  function getProfileWeight() {
+    try {
+      var saved = parseFloat(window.localStorage.getItem(PROFILE_WEIGHT_KEY));
+      return isFinite(saved) && saved > 0 ? saved : DEFAULT_PROFILE_WEIGHT;
+    } catch (e) { return DEFAULT_PROFILE_WEIGHT; }
+  }
+
   /* ------------------------------------------------------------------ */
   /* 4. REFERÊNCIAS DO DOM                                               */
   /* ------------------------------------------------------------------ */
 
   var viewHome = document.getElementById("view-home");
   var viewWorkout = document.getElementById("view-workout");
+  var viewDiet = document.getElementById("view-diet");
+  var viewProfile = document.getElementById("view-profile");
   var weekList = document.getElementById("week-list");
   var todaySpotlight = document.getElementById("today-spotlight");
   var overviewList = document.getElementById("overview-list");
@@ -202,6 +206,13 @@
   var completeBtn = document.getElementById("btn-complete");
   var completeLabel = document.getElementById("complete-label");
   var toastEl = document.getElementById("toast");
+  var navLinks = document.querySelectorAll(".main-nav-link");
+  var profileAgeEl = document.getElementById("profile-age");
+  var profileWeightValueEl = document.getElementById("profile-weight-value");
+  var profileWeightInput = document.getElementById("profile-weight-input");
+  var profileWeightForm = document.getElementById("profile-weight-form");
+  var profileBmiValueEl = document.getElementById("profile-bmi-value");
+  var profileBmiClassificationEl = document.getElementById("profile-bmi-classification");
 
   var currentDayKey = null;
   var toastTimer = null;
@@ -332,6 +343,19 @@
   /* 8. RENDER — TELA DE TREINO                                          */
   /* ------------------------------------------------------------------ */
 
+  // Variações de nome de arquivo aceitas em assets/exercises. Alguns arquivos
+  // foram salvos com extensão maiúscula ou com sufixo diferente; tentamos cada
+  // uma antes de considerar o vídeo indisponível.
+  var VIDEO_EXTENSIONS = [".mp4", ".MP4", ".mov", ".MOV", ".webm"];
+
+  function videoCandidates(slug) {
+    var list = [];
+    VIDEO_EXTENSIONS.forEach(function (extension) {
+      list.push("assets/exercises/" + encodeURIComponent(slug) + extension);
+    });
+    return list;
+  }
+
   function buildExerciseCard(exercise, accent) {
     var card = document.createElement("article");
     card.className = "exercise-card";
@@ -347,61 +371,108 @@
         setsBadge +
       '</div>' +
       '<div class="exercise-media">' +
-        '<div class="exercise-loading">' +
-          '<img src="assets/images/manu.png" alt="" aria-hidden="true" class="exercise-loading-image" />' +
+        '<video class="exercise-video is-loading" muted loop playsinline autoplay preload="auto" aria-label="Demonstração do exercício ' + exercise.name + '"></video>' +
+        '<div class="exercise-loading" aria-live="polite">' +
+          '<img class="exercise-loading-image" src="assets/images/manu.png" alt="" aria-hidden="true">' +
           '<p class="exercise-loading-text">Carregando exercício...</p>' +
         '</div>' +
-        '<div class="exercise-error is-hidden" role="status">' +
-          '<svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="12" r="1.4" fill="currentColor"/><circle cx="15.5" cy="12" r="1.4" fill="currentColor"/></svg>' +
-          '<span>Não foi possível carregar a demonstração.</span>' +
-        '</div>' +
-        '<video ' +
-          'src="' + exercise.media + '" ' +
-          'class="exercise-video" ' +
-          'autoplay loop muted playsinline preload="metadata" ' +
-          'aria-label="' + exercise.alt + '" ' +
-          'title="' + exercise.alt + '"></video>' +
+      '</div>' +
+      '<div class="exercise-weight">' +
+        '<div class="exercise-weight-summary"><span>Último peso: <strong data-last-weight>—</strong></span><span>Melhor: <strong data-best-weight>—</strong></span></div>' +
+        '<form class="exercise-weight-form"><label class="visually-hidden">Atualizar peso para ' + exercise.name + '</label><input type="number" inputmode="decimal" min="0" step="0.1" placeholder="Peso em kg" aria-label="Atualizar peso para ' + exercise.name + '"><button type="submit">Salvar</button></form>' +
       '</div>';
 
-    var video = card.querySelector("video");
-    var loadingOverlay = card.querySelector(".exercise-loading");
-    var errorOverlay = card.querySelector(".exercise-error");
-    var manuImg = card.querySelector(".exercise-loading-image");
-    var settled = false;
+    var lastWeightEl = card.querySelector("[data-last-weight]");
+    var bestWeightEl = card.querySelector("[data-best-weight]");
+    var weightForm = card.querySelector(".exercise-weight-form");
+    var weightInput = weightForm.querySelector("input");
 
-    // Se a imagem da Manu ainda não estiver no projeto, some com ela em vez
-    // de mostrar o ícone de imagem quebrada — o texto continua aparecendo.
-    manuImg.addEventListener("error", function () {
-      manuImg.classList.add("is-missing");
+    function renderWeight() {
+      var record = readExerciseWeights()[exercise.slug] || {};
+      lastWeightEl.textContent = record.last != null ? formatWeight(record.last) : "Ainda não registrado";
+      bestWeightEl.textContent = record.best != null ? formatWeight(record.best) : "—";
+    }
+    renderWeight();
+    weightForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var nextWeight = parseFloat(String(weightInput.value).replace(",", "."));
+      if (!isFinite(nextWeight) || nextWeight < 0) { showToast("Digite um peso válido em kg."); return; }
+      var records = readExerciseWeights();
+      var previous = records[exercise.slug] || {};
+      records[exercise.slug] = { last: nextWeight, best: Math.max(previous.best || 0, nextWeight) };
+      try { window.localStorage.setItem(EXERCISE_WEIGHTS_KEY, JSON.stringify(records)); }
+      catch (e) { showToast("Não foi possível salvar o peso neste aparelho."); return; }
+      weightInput.value = "";
+      renderWeight();
+      showToast("Peso atualizado para " + formatWeight(nextWeight) + " 💪");
+    });
+
+    var media = card.querySelector(".exercise-media");
+    var video = media.querySelector(".exercise-video");
+    var loading = media.querySelector(".exercise-loading");
+    var loadingImage = media.querySelector(".exercise-loading-image");
+    var videoFailed = false;
+
+    // O loading já existe no primeiro render do card; apenas o vídeo decide
+    // quando ele pode desaparecer. Não há temporizador artificial aqui.
+    function showVideo() {
+      if (videoFailed || !loading || !video) return;
+      loading.classList.add("is-hidden");
+      video.classList.remove("is-loading");
+      loading.addEventListener("transitionend", function () {
+        if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+      }, { once: true });
+    }
+
+    function showVideoError() {
+      if (!media || media.querySelector(".exercise-error")) return;
+      videoFailed = true;
+      video.classList.add("is-loading");
+
+      var error = document.createElement("div");
+      error.className = "exercise-error";
+      error.setAttribute("role", "status");
+      error.textContent = "Não foi possível carregar a demonstração.";
+      error.title = "Arquivo esperado: assets/exercises/" + exercise.slug + ".mp4";
+      media.appendChild(error);
+
+      if (loading && loading.parentNode) {
+        loading.classList.add("is-hidden");
+        loading.addEventListener("transitionend", function () {
+          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+        }, { once: true });
+      }
+    }
+
+    // Caso a ilustração não esteja disponível, o texto de loading continua
+    // presente e o card não expõe informações técnicas ao usuário.
+    loadingImage.addEventListener("error", function () {
+      loadingImage.classList.add("is-missing");
     }, { once: true });
 
-    function showVideo() {
-      if (settled) return;
-      settled = true;
-      loadingOverlay.classList.add("is-hidden");
+    // Fonte definida por JS (sem <source>): o evento `error` do <video> só
+    // dispara quando a src está no próprio elemento. Com <source>, a falha
+    // ficava silenciosa e o card ficava eternamente em "Carregando...".
+    var candidates = videoCandidates(exercise.slug);
+    var candidateIndex = 0;
+
+    function loadCandidate() {
+      if (candidateIndex >= candidates.length) { showVideoError(); return; }
+      video.src = candidates[candidateIndex++];
+      video.load();
+      var attempt = video.play();
+      if (attempt && typeof attempt.catch === "function") attempt.catch(function () {});
     }
 
-    function showError() {
-      if (settled) return;
-      settled = true;
-      // Estados independentes: apenas alterna a visibilidade, sem recriar
-      // o container de mídia nem destruir o componente de carregamento.
-      loadingOverlay.classList.add("is-hidden");
-      errorOverlay.classList.remove("is-hidden");
-    }
-
-    video.addEventListener("canplay", showVideo);
     video.addEventListener("loadeddata", showVideo);
-    video.addEventListener("error", showError);
+    video.addEventListener("canplay", showVideo);
+    video.addEventListener("error", function () { loadCandidate(); });
 
-    // Caso o vídeo já esteja pronto (cache/service worker) antes dos
-    // listeners serem registrados.
-    if (video.error) {
-      showError();
-    } else if (video.readyState >= 2) {
-      showVideo();
-    }
+    loadCandidate();
 
+    // `canplay` pode já ter ocorrido antes da ligação dos listeners quando o
+    // vídeo vier do cache; nesse caso, preservamos a mesma transição.
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) showVideo();
 
     return card;
   }
@@ -493,13 +564,29 @@
   /* 9. NAVEGAÇÃO ENTRE TELAS                                            */
   /* ------------------------------------------------------------------ */
 
+  function setActiveNav(viewName) {
+    navLinks.forEach(function (link) {
+      var active = link.getAttribute("data-view") === viewName;
+      link.classList.toggle("is-active", active);
+      if (active) link.setAttribute("aria-current", "page"); else link.removeAttribute("aria-current");
+    });
+  }
+
+  function hideAllViews() {
+    viewHome.classList.add("is-hidden");
+    viewWorkout.classList.add("is-hidden");
+    viewDiet.classList.add("is-hidden");
+    viewProfile.classList.add("is-hidden");
+  }
+
   function openWorkout(dayKey) {
     var day = WEEK.find(function (d) { return d.key === dayKey; });
     if (!day) return;
     currentDayKey = dayKey;
     renderWorkout(day);
-    viewHome.classList.add("is-hidden");
+    hideAllViews();
     viewWorkout.classList.remove("is-hidden");
+    setActiveNav("");
     viewWorkout.focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: "smooth" });
     history.replaceState({ view: "workout", day: dayKey }, "", "#" + dayKey);
@@ -507,14 +594,50 @@
 
   function goHome() {
     currentDayKey = null;
-    syncToday();
     renderWeekStrip();
     renderSpotlight();
     renderOverview();
-    viewWorkout.classList.add("is-hidden");
+    hideAllViews();
     viewHome.classList.remove("is-hidden");
+    setActiveNav("home");
     window.scrollTo({ top: 0, behavior: "smooth" });
     history.replaceState({ view: "home" }, "", "#inicio");
+  }
+
+  function calculateAge() {
+    var birth = new Date(2004, 4, 14);
+    var now = new Date();
+    var age = now.getFullYear() - birth.getFullYear();
+    var beforeBirthday = now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate());
+    return age - (beforeBirthday ? 1 : 0);
+  }
+
+  function bmiClassification(bmi) {
+    if (bmi < 18.5) return "Magreza (abaixo do peso)";
+    if (bmi < 25) return "Peso normal (eutrofia)";
+    if (bmi < 30) return "Sobrepeso";
+    if (bmi < 35) return "Obesidade Grau I";
+    if (bmi < 40) return "Obesidade Grau II";
+    return "Obesidade Grau III (grave)";
+  }
+
+  function renderProfile() {
+    var weight = getProfileWeight();
+    var bmi = weight / (1.57 * 1.57);
+    profileAgeEl.textContent = calculateAge();
+    profileWeightValueEl.textContent = formatWeight(weight);
+    profileWeightInput.value = weight;
+    profileBmiValueEl.textContent = bmi.toFixed(1).replace(".", ",");
+    profileBmiClassificationEl.textContent = bmiClassification(bmi);
+  }
+
+  function openInformationView(name) {
+    hideAllViews();
+    if (name === "profile") { renderProfile(); viewProfile.classList.remove("is-hidden"); viewProfile.focus({ preventScroll: true }); }
+    else { viewDiet.classList.remove("is-hidden"); viewDiet.focus({ preventScroll: true }); }
+    setActiveNav(name);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    history.replaceState({ view: name }, "", "#" + (name === "diet" ? "dieta" : "perfil"));
   }
 
   /* ------------------------------------------------------------------ */
@@ -535,11 +658,20 @@
   /* ------------------------------------------------------------------ */
 
   btnHome.addEventListener("click", goHome);
+  btnToday.addEventListener("click", function () { openWorkout(WEEK[TODAY_INDEX].key); });
   btnBack.addEventListener("click", goHome);
+  navLinks.forEach(function (link) {
+    link.addEventListener("click", function () { goHome(); if (link.getAttribute("data-view") !== "home") openInformationView(link.getAttribute("data-view")); });
+  });
 
-  btnToday.addEventListener("click", function () {
-    syncToday();
-    openWorkout(WEEK[TODAY_INDEX].key);
+  profileWeightForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    var nextWeight = parseFloat(String(profileWeightInput.value).replace(",", "."));
+    if (!isFinite(nextWeight) || nextWeight <= 0 || nextWeight > 500) { showToast("Digite um peso válido em kg."); return; }
+    try { window.localStorage.setItem(PROFILE_WEIGHT_KEY, String(nextWeight)); }
+    catch (e) { showToast("Não foi possível salvar o peso neste aparelho."); return; }
+    renderProfile();
+    showToast("Peso atualizado! O IMC foi recalculado.");
   });
 
   completeBtn.addEventListener("click", function () {
@@ -552,58 +684,28 @@
   });
 
   window.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && !viewWorkout.classList.contains("is-hidden")) {
+    if (e.key === "Escape" && (!viewWorkout.classList.contains("is-hidden") || !viewDiet.classList.contains("is-hidden") || !viewProfile.classList.contains("is-hidden"))) {
       goHome();
     }
   });
-
-  // Se o dia mudou enquanto a página estava aberta (ex.: aberta às 23h59
-  // e esquecida até depois da meia-noite, ou o celular voltou de segundo
-  // plano no dia seguinte), atualiza o destaque do dia atual. Só re-renderiza
-  // a tela inicial — se a pessoa estiver vendo o treino de um dia específico,
-  // isso não é interrompido.
-  function handlePossibleDateChange() {
-    var changed = syncToday();
-    if (changed && !viewHome.classList.contains("is-hidden")) {
-      renderWeekStrip();
-      renderSpotlight();
-      renderOverview();
-    }
-  }
-
-  document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "visible") {
-      handlePossibleDateChange();
-    }
-  });
-
-  // Agenda uma única verificação exatamente na próxima meia-noite local
-  // (em vez de um intervalo repetido) e se reagenda a cada execução.
-  function scheduleMidnightSync() {
-    var now = new Date();
-    var nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 3);
-    var ms = nextMidnight.getTime() - now.getTime();
-    setTimeout(function () {
-      handlePossibleDateChange();
-      scheduleMidnightSync();
-    }, ms);
-  }
 
   /* ------------------------------------------------------------------ */
   /* 12. INICIALIZAÇÃO                                                   */
   /* ------------------------------------------------------------------ */
 
   function init() {
-    syncToday();
     renderWeekStrip();
     renderSpotlight();
     renderOverview();
-    scheduleMidnightSync();
 
     var hash = window.location.hash.replace("#", "");
     var validDay = WEEK.some(function (d) { return d.key === hash; });
     if (validDay) {
       openWorkout(hash);
+    } else if (hash === "dieta") {
+      openInformationView("diet");
+    } else if (hash === "perfil") {
+      openInformationView("profile");
     }
   }
 
@@ -621,4 +723,3 @@
     });
   }
 })();
-
