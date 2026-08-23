@@ -16,9 +16,8 @@
   var GLUTEO_BASE = [
     ex("Elevação pélvica", "4 × 8–12", "elevacao-pelvica"),
     ex("RDL", "3 × 12", "rdl"),
-    ex("Cadeira abdutora", "3 × 15–20", "cadeira-abdutora"),
     ex("Abdução na polia", "3 × 12", "abducao-polia"),
-    ex("Cadeira flexora", "3 × 15", "cadeira-flexora"),
+    ex("Cadeira flexora", "3 × 12", "cadeira-flexora"),
   ];
 
   var WEEK = [
@@ -26,7 +25,9 @@
       key: "seg", short: "SEG", full: "Segunda-feira", emoji: "🍑",
       title: "Glúteo Day", accent: "pink", type: "workout",
       groups: [
-        { name: null, exercises: GLUTEO_BASE.concat([ex("Panturrilha", "3 × 15 + 20", "panturrilha")]) }
+        { name: null, exercises: GLUTEO_BASE.concat([
+          ex("Cadeira abdutora", "3 × 10–12", "cadeira-abdutora"),
+          ex("Panturrilha", "3 × 15 + 20", "panturrilha")]) }
       ]
     },
     {
@@ -36,7 +37,7 @@
         { name: "Costas", exercises: [
           ex("Puxada alta aberta", "3 × 8–12", "puxada-alta-aberta"),
           ex("Remada baixa fechada", "3 × 8–12", "remada-baixa-fechada"),
-          ex("Pulldown", "3 × 10–15", "pulldown"),
+          ex("Pulldown", "3 × 8–12", "pulldown"),
         ]},
         { name: "Ombros", exercises: [
           ex("Desenvolvimento com halteres/máquina", "2 × 8–12", "desenvolvimento-ombros"),
@@ -60,7 +61,7 @@
         { name: "Costas", exercises: [
           ex("Puxada alta neutra/fechada", "3 × 8–12", "puxada-alta-neutra"),
           ex("Remada articulada/máquina", "3 × 8–12", "remada-articulada"),
-          ex("Pulldown", "2–3 × 10–15", "pulldown"),
+          ex("Pulldown", "2–3 × 8–12", "pulldown"),
         ]},
         { name: "Bíceps", exercises: [
           ex("Rosca direta", "3 × 8–12", "rosca-direta"),
@@ -77,7 +78,9 @@
       key: "sex", short: "SEX", full: "Sexta-feira", emoji: "🦵",
       title: "Glúteo + Quadríceps", accent: "peach", type: "workout",
       groups: [
-        { name: null, exercises: GLUTEO_BASE.concat([ex("Agachamento tarsa", "", "agachamento-tarsa")]) }
+        { name: null, exercises: GLUTEO_BASE.concat([
+          ex("Cadeira adutora", "3 × 10–12", "cadeira-adutora"),
+          ex("Agachamento taça", "3 × 8–12", "agachamento-taça")]) }
       ]
     },
     {
