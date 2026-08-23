@@ -27,7 +27,7 @@
       groups: [
         { name: null, exercises: GLUTEO_BASE.concat([
           ex("Cadeira abdutora", "3 × 10–12", "cadeira-abdutora"),
-          ex("Panturrilha", "3 × 15 + 20", "panturrilha")]) }
+          ex("Panturrilha", "3 × 15–20", "panturrilha")]) }
       ]
     },
     {
